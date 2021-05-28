@@ -20,8 +20,7 @@ typedef struct List
 } List;
 
 List *list_create();
-void list_destroy(List *list);
-void list_clear(List *list);
+void list_print(List *list);
 void list_clear_destroy(List *list);
 
 #define list_count(A) ((A)->count)
@@ -35,11 +34,16 @@ void list_unshift(List *list, void *value);
 void *list_shift(List *list);
 
 void *list_remove(List *list, ListNode *node);
+void *list_copy(List *from, List *to);
+
+void list_join(List *first, List *second);
+void list_split(List *list);
 
 #define LIST_FOREACH(L, S, M, V) \
 	ListNode *_node = NULL; \
 	ListNode *V = NULL; \
 	for (V = _node = L->S; _node != NULL; V = _node = _node->M)
+	
 
 #endif
 

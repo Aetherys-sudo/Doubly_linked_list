@@ -3,13 +3,26 @@
 
 List *list_create()
 {
-	return calloc(1, sizeof(List)); 
+	return calloc(1, sizeof(List));
 }
 
-void list_destroy(List *list)
+void list_print(List* list)
 {
+	check(list != NULL, "List to be printed cannot be null.");
+	
 	LIST_FOREACH(list, first, next, cur)
 	{
+		printf("Printed list: %d /n", (*(int *) cur->value));
+	}
+	
+error:
+	return;
+}
+
+void list_clear_destroy(List *list)
+{
+	LIST_FOREACH(list, first, next, cur)
+	{	
 		if (cur->prev)
 		{
 			free(cur->prev);
@@ -18,20 +31,7 @@ void list_destroy(List *list)
 	
 	free(list->last);
 	free(list);
-}
-
-void list_clear(List *list)
-{
-	LIST_FOREACH(list, first, next, cur)
-	{
-		free(cur->value);
-	}
-}
-
-void list_clear_destroy(List *list)
-{
-	list_clear(list);
-	list_destroy(list);
+	
 }
 
 void list_push(List *list, void *value)
@@ -78,8 +78,8 @@ void list_unshift(List *list, void *value)
 	}
 	else
 	{
-		node->next = list->first;
 		list->first->prev = node;
+		node->next = list->first;
 		list->first = node;
 	}
 	
@@ -133,6 +133,32 @@ void *list_remove(List *list, ListNode *node)
 	
 error:
 	return result;
+}
+
+void *list_copy(List *from, List *to)
+{
+	check(from != NULL, "List to copy from cannot be NULL.");
+	int i = 0;
+	
+	if (!to)
+	{
+		to = list_create();
+	}
+	
+	LIST_FOREACH(from, first, next, cur)
+	{
+		i ++;
+		list_push(to, cur->value);
+		if (i > list_count(from))
+		{
+			printf("Maximum copy size reached.\n");
+			break;
+		}
+	}	
+
+error:
+	return to;
+	
 }
 
 

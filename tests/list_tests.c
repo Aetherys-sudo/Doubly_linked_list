@@ -4,16 +4,13 @@
 
 List *list = NULL;
 
-char *test1 = "test1 data";
-char *test2 = "test2 data";
-char *test3 = "test3 data";
-
 char *test_create()
 {
 	list = list_create();
 	mu_assert(list != NULL, "List could not be created.");
 	
 	return NULL;
+	
 }
 
 char *test_clear_destroy()
@@ -24,73 +21,115 @@ char *test_clear_destroy()
 }
 
 char *test_push_pop()
+{	
+	int i = 0;
+	int *arr = calloc(1, 9 * sizeof(int));
+	
+	for (i = 0; i < 9; i ++)
+	{
+		arr[i] = rand() % 100;
+		list_push(list, &arr[i]);
+	}
+	
+	
+	mu_assert(list_count(list) == 9, "Wrong list count value on push.");
+	
+	int *val = NULL;
+	for (i = 8; i >= 0; i --)
+	{
+		val = list_pop(list);
+		mu_assert(*val == arr[i], "Wrong value on pop.");
+	}
+	mu_assert(list_count(list) == 0, "Wrong list count value on pop.");
+	
+	free(arr);
+	return NULL;
+}
+
+char *test_print()
 {
-	list_push(list, test1);
-	mu_assert(list_last(list) == test1, "Pop function failed test1.");
-	
-	list_push(list, test2);
-	mu_assert(list_last(list) == test2, "Pop function failed test2.");
-	
-	list_push(list, test3);
-	mu_assert(list_last(list) == test3, "Pop function failed test3.");
-	
-	mu_assert(list_count(list) == 3, "Wrong count after push.");
-	
-	char *val = list_pop(list);
-	mu_assert(test3 == val, "Wrong value on pop.");
-	
-	val = list_pop(list);
-	mu_assert(test2 == val, "Wrong value on pop.");
-	
-	val = list_pop(list);
-	mu_assert(test1 == val, "Wrong value on pop.");
-	
-	mu_assert(list_count(list) == 0, "Wrong value after pop.");
+	list_print(list);
 	
 	return NULL;
 }
 
-char *test_unshift()
+char *test_unshift_shift()
 {
-	list_unshift(list, test3);
-	mu_assert(list_first(list) == test3, "Unshift function failed test3.");
+	int i = 0;
+	int *arr = calloc(1, 9 * sizeof(int));
 	
-	list_unshift(list, test2);
-	mu_assert(list_first(list) == test2, "Unshift function failed test2.");
+	for (i = 0; i < 9; i ++)
+	{
+		arr[i] = rand() % 100;
+		list_unshift(list, &arr[i]);
+	}
 	
-	list_unshift(list, test1);
-	mu_assert(list_first(list) == test1, "Unshift function failed test1.");
+	mu_assert(list_count(list) == 9, "Wrong list count value on unshift.");
 	
-	mu_assert(list_count(list) == 3, "Wrong count after unshift.");
+	int *val = NULL;
+	for (i = 8; i >= 0; i --)
+	{
+		val = list_shift(list);
+		mu_assert(*val == arr[i], "Wrong value on shift.");
+	}
+	mu_assert(list_count(list) == 0, "Wrong list count value on pop.");
+	
+	free(arr);
+
+	return NULL;
+}
+
+char *test_copy()
+{
+	List *from = list_create();
+	List *to = list_create();
+	int i = 0;
+	int *arr = calloc(1, 9 * sizeof(int));
+	
+	for (i = 0; i < 9; i ++)
+	{
+		arr[i] = rand() % 100;
+		list_push(from, &arr[i]);
+	}
+	
+	list_copy(from, to);
+	mu_assert(list_count(from) = list_count(to), "Wrong size after copy.");
+	ListNode *node = to->first;
+	
+	LIST_FOREACH(to, first, next, cur)
+	{
+		if (node != NULL)
+		{
+			mu_assert(node->value == cur->value, "Wrong values after copy.");
+			node = node->next;
+		}
+	}
+	
+	list_clear_destroy(from);
+	list_clear_destroy(to);
+	free(arr);
 	
 	return NULL;
+	
 }
 
 char *test_remove()
 {
-	char *val = list_remove(list, list->first->next);
+	int i = 0;
+	int size = 4;
+	int *arr = calloc(1, 4 * sizeof(int));
+	for (i = 0; i < 4; i ++)
+	{
+		arr[i] = rand() % 100;
+		list_push(list, &arr[i]);
+	}
 	
-	mu_assert(val == test2, "Wrong value on remove.");
-	mu_assert(list_count(list) == 2, "Wrong count on remove.");
+	int *value = list_remove(list, list->first->next);
 	
-	mu_assert(list_first(list) == test1, "Wrong first element on remove.");
+	mu_assert(list_count(list) == size - 1, "Wrong size after remove.");
+	mu_assert(*value == arr[1], "Wrong returned value after remove.");
 	
-	mu_assert(list_last(list) == test3, "Wrong last element on remove.");
-	
-	return NULL;
-}
-
-char *test_shift()
-{
-	mu_assert(list_count(list) != 0, "Wrong count before shift.");
-	
-	char *val = list_shift(list);
-	mu_assert(test1 == val, "Wrong value on shift.");
-	
-	val = list_shift(list);
-	mu_assert(test3 == val, "Wrong value on shift.");
-	
-	mu_assert(list_count(list) == 0, "Wrong value after shift.");
+	free(arr);
 	
 	return NULL;
 }
@@ -101,10 +140,13 @@ char *all_tests()
 	
 	mu_run_test(test_create);
 	mu_run_test(test_push_pop);
-	mu_run_test(test_unshift);
+	mu_run_test(test_unshift_shift);
+	mu_run_test(test_print);
 	mu_run_test(test_remove);
-	mu_run_test(test_shift);
+	mu_run_test(test_copy);
 	mu_run_test(test_clear_destroy);
+	
+	
 	
 	return NULL;
 }
