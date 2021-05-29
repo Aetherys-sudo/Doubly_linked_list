@@ -6,15 +6,26 @@ List *list_create()
 	return calloc(1, sizeof(List));
 }
 
+void list_populate(List *list, int *arr, int n)
+{
+	int i = 0;
+	
+	for (i = 0; i < n; i ++)
+	{
+		arr[i] = rand() % 100;
+		list_push(list, &arr[i]);
+	}
+}
+
 void list_print(List* list)
 {
-	check(list != NULL, "List to be printed cannot be null.");
-	
+	check(list != NULL, "List to be printed cannot be NULL.");
+	printf("Printed list: ");
 	LIST_FOREACH(list, first, next, cur)
 	{
-		printf("Printed list: %d /n", (*(int *) cur->value));
+		printf("%d ", (*(int *) cur->value));
 	}
-	
+	printf("\n");
 error:
 	return;
 }
@@ -135,15 +146,11 @@ error:
 	return result;
 }
 
-void *list_copy(List *from, List *to)
+void list_copy(List *from, List *to)
 {
 	check(from != NULL, "List to copy from cannot be NULL.");
+	check(to != NULL, "List to copy to cannot be NULL.");
 	int i = 0;
-	
-	if (!to)
-	{
-		to = list_create();
-	}
 	
 	LIST_FOREACH(from, first, next, cur)
 	{
@@ -157,9 +164,33 @@ void *list_copy(List *from, List *to)
 	}	
 
 error:
-	return to;
+	return;
 	
 }
 
+void list_join(List *total, List *firstl, List *second)
+{
+	check(total != NULL, "List to be merged into cannot be NULL.");
+	check(firstl != NULL, "First list to be merged cannot be NULL.");
+	check(second != NULL, "Second list to be merged cannot be NULL.");
+	
+	total->first = total->last = NULL;
+	LIST_FOREACH(firstl, first, next, cur)
+	{
+		list_push(total, cur->value);
+	}
+	
+	ListNode *node = NULL;
+	ListNode *cur1 = NULL;
+	for (cur1 = node = second->first; cur1 != NULL; cur1 = node = node->next)
+	{
+		list_push(total, cur1->value);
+	}
+	
+error:
+	return;
+}
 
+void list_split(List *list, ListNode *node)
+{
 	
